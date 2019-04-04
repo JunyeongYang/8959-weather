@@ -6,7 +6,7 @@ export default class Temperature extends Component {
     return (
       <View style={styles.upper}>
         <Text>Icon Here!</Text>
-        <Text style={styles.temp}>45˚</Text>
+        <Text style={styles.temp}>35˚</Text>
       </View>
     )
   }
