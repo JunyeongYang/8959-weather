@@ -34,7 +34,8 @@ export default class App extends React.Component {
   }
 
   _getWeather = (lat, lon) => {
-    const url = `http://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&APPID=${WEATHER_API_KEY}`
+    const url2 = `http://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&APPID=${WEATHER_API_KEY}`;
+    const url = `http://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&APPID=${WEATHER_API_KEY}`;
     fetch(url)
       .then(r => r.json())
       .then(json => {
@@ -45,8 +46,21 @@ export default class App extends React.Component {
             name: json.weather[0].main
           }
         });
-        console.log(json);
-        console.log(this.state);
+        // console.log(json);
+        // console.log(this.state);
+        fetch(url2)
+          .then(r=> r.json())
+          .then(json => {
+            const test = json.list;
+            // console.log(json.list);
+            test.forEach(el=> {
+              // const data
+              console.log(el.dt_txt);
+              console.log(el.main.temp);
+              console.log(el.main.humidity);
+              console.log(el.weather[0].main);
+            })
+          })
       })
       .catch(e => console.log(e));
   }

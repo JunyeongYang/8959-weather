@@ -17,9 +17,60 @@ import PropTypes from 'prop-types';
 function Weather({ wCases }){
   return (
     <View style={styles.upper}>
-      <MaterialCommunityIcons style={styles.icons} color="white" size={100} name={wCases.iconName} />
-      <Text style={styles.temp}>{wCases.temperature}˚</Text>
-      <Text style={styles.title}>{wCases.title}</Text>
+      <View style={styles.content}>
+        <View style={styles.contView}>
+          <MaterialCommunityIcons style={styles.icons} color="white" size={60} name={wCases.iconName} />
+        </View>
+        <View style={styles.contView}>
+          <Text style={styles.temp}>{wCases.temperature}˚</Text>
+          <Text style={styles.title}>{wCases.title}</Text>
+        </View>
+      </View>
+      <View style={styles.content}>
+        <View style={styles.contView}>
+          <MaterialCommunityIcons style={styles.icons} color="white" size={60} name={wCases.iconName} />
+        </View>
+        <View style={styles.contView}>
+          <Text style={styles.temp}>{wCases.temperature}˚</Text>
+          <Text style={styles.title}>{wCases.title}</Text>
+        </View>
+      </View>
+      <View style={styles.content}>
+        <View style={styles.contView}>
+          <MaterialCommunityIcons style={styles.icons} color="white" size={60} name={wCases.iconName} />
+        </View>
+        <View style={styles.contView}>
+          <Text style={styles.temp}>{wCases.temperature}˚</Text>
+          <Text style={styles.title}>{wCases.title}</Text>
+        </View>
+      </View>
+      <View style={styles.content}>
+        <View style={styles.contView}>
+          <MaterialCommunityIcons style={styles.icons} color="white" size={60} name={wCases.iconName} />
+        </View>
+        <View style={styles.contView}>
+          <Text style={styles.temp}>{wCases.temperature}˚</Text>
+          <Text style={styles.title}>{wCases.title}</Text>
+        </View>
+      </View>
+      <View style={styles.content}>
+        <View style={styles.contView}>
+          <MaterialCommunityIcons style={styles.icons} color="white" size={60} name={wCases.iconName} />
+        </View>
+        <View style={styles.contView}>
+          <Text style={styles.temp}>{wCases.temperature}˚</Text>
+          <Text style={styles.title}>{wCases.title}</Text>
+        </View>
+      </View>
+      <View style={styles.content}>
+        <View style={styles.contView}>
+          <MaterialCommunityIcons style={styles.icons} color="white" size={60} name={wCases.iconName} />
+        </View>
+        <View style={styles.contView}>
+          <Text style={styles.temp}>{wCases.temperature}˚</Text>
+          <Text style={styles.title}>{wCases.title}</Text>
+        </View>
+      </View>
     </View>
   );
 }
@@ -37,16 +88,25 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center'
   },
+  content:{
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  contView: {
+    flex:1,
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
   icons: {
-    marginTop: 70
   },
   temp: {
-    fontSize: 60,
+    fontSize: 40,
     backgroundColor: 'transparent',
     color: 'white',
   },
   title: {
-    fontSize: 30,
+    fontSize: 20,
     color: 'white'
   }
 });
