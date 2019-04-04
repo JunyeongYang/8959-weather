@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
 import { StyleSheet, Text, View, Image, ActivityIndicator, StatusBar } from 'react-native';
-import Weather from "./components/WeatherIndex";
+import WeatherIndex from "./components/WeatherIndex";
 import { AdMobBanner } from 'expo';
+
+const WEATHER_API_KEY = "151f154f63bc0d2064c7f558721da759";
 
 export default class App extends React.Component {
   bannerError(e) {
@@ -9,18 +11,56 @@ export default class App extends React.Component {
   }
 
   state = {
-    isLoaded: true
+    isLoaded: false,
+    error: null,
+    weatherInfo: {
+      temperature: null,
+      name: null
+    }
+  };
+
+  componentDidMount(){
+    navigator.geolocation.getCurrentPosition( 
+      position => {
+        console.log(position);
+        this._getWeather(position.coords.latitude, position.coords.longitude);
+      },
+      error => {
+        this.setState({
+          error: error
+        });
+      }
+    );
   }
+
+  _getWeather = (lat, lon) => {
+    const url = `http://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&APPID=${WEATHER_API_KEY}`
+    fetch(url)
+      .then(r => r.json())
+      .then(json => {
+        this.setState({
+          isLoaded: true,
+          weatherInfo: {
+            temperature: json.main.temp,
+            name: json.weather[0].main
+          }
+        });
+        console.log(json);
+        console.log(this.state);
+      })
+      .catch(e => console.log(e));
+  }
+
   render() {
-    const { isLoaded } = this.state;
+    const { isLoaded, error, weatherInfo } = this.state;
     
     return (
       <View style={styles.container}>
         <StatusBar hidden={ true } />
-        {isLoaded ? <Weather /> : (
+        {isLoaded ? <WeatherIndex weatherInfo={ weatherInfo }/> : (
           <View style={styles.loading}>
-            <ActivityIndicator size="large"/>
-            <Text style={styles.textLoading}>Getting Data from Server...</Text>
+            { error ? null : <ActivityIndicator size="large"/>}
+            { error ? <Text style={styles.errorText}>{error}</Text> : <Text style={styles.textLoading}>Getting Data from Server...</Text> }
           </View>
         )}
         <AdMobBanner 
@@ -38,6 +78,10 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
   },
+  errorText: {
+    color: "red",
+    marginBottom: 40
+  },
   loading: {
     flex: 1,
     backgroundColor: '#FDF6AA',
@@ -48,5 +92,5 @@ const styles = StyleSheet.create({
   textLoading: {
     marginTop: 15,
     fontSize: 20,
-  }
+  },
 });
