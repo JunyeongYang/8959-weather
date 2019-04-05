@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import { StyleSheet, Text, View, Image, ActivityIndicator, StatusBar } from 'react-native';
 import WeatherIndex from "./components/WeatherIndex";
 import { AdMobBanner } from 'expo';
+import Moment from 'moment';
+import { LinearGradient } from 'expo';
 
 const WEATHER_API_KEY = "151f154f63bc0d2064c7f558721da759";
 
@@ -13,17 +15,27 @@ export default class App extends React.Component {
   state = {
     isLoaded: false,
     error: null,
+    timezone: Math.abs(new Date().getTimezoneOffset() / 60),
     weatherInfo: {
       temperature: null,
-      name: null
-    }
+      humidity: null,
+      name: null,
+      time: null,
+      city: null,
+      fullDT: null
+    },
+    hourlyWeather: [],
+    prevDate: null,
+    bgColors: ['#d57eeb', '#fccb90', '#a6c0fe', '#8fd3f4', '#f5576c', '#fee140', '#a8edea', '#fef9d7', '#d299c2', '#764ba2'],
+    rndNo1: Math.floor(Math.random()*10),
+    rndNo2: Math.floor(Math.random()*10)
   };
 
   componentDidMount(){
     navigator.geolocation.getCurrentPosition( 
       position => {
-        console.log(position);
         this._getWeather(position.coords.latitude, position.coords.longitude);
+        console.log(position);
       },
       error => {
         this.setState({
@@ -34,47 +46,75 @@ export default class App extends React.Component {
   }
 
   _getWeather = (lat, lon) => {
-    const url2 = `http://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&APPID=${WEATHER_API_KEY}`;
-    const url = `http://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&APPID=${WEATHER_API_KEY}`;
-    fetch(url)
+    const curWeatherUrl = `http://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&APPID=${WEATHER_API_KEY}`;
+    const hourlyWeatherUrl = `http://api.openweathermap.org/data/2.5/forecast/hourly?lat=${lat}&lon=${lon}&units=metric&APPID=${WEATHER_API_KEY}`;
+    fetch(curWeatherUrl)
       .then(r => r.json())
       .then(json => {
+        const curTime = Moment.unix(json.dt).format("YYYY-MM-DD HH:mm");
         this.setState({
-          isLoaded: true,
           weatherInfo: {
-            temperature: json.main.temp,
-            name: json.weather[0].main
+            temperature: `${Math.floor(json.main.temp)}˚`,
+            humidity: `${json.main.humidity}%`,
+            name: json.weather[0].main,
+            time: curTime.split(' ')[1],
+            city: json.name,
+            fullDT: curTime
           }
         });
-        // console.log(json);
-        // console.log(this.state);
-        fetch(url2)
+        fetch(hourlyWeatherUrl)
           .then(r=> r.json())
           .then(json => {
-            const test = json.list;
-            // console.log(json.list);
-            test.forEach(el=> {
-              // const data
-              console.log(el.dt_txt);
-              console.log(el.main.temp);
-              console.log(el.main.humidity);
-              console.log(el.weather[0].main);
+            // console.log(json);
+            const weatherList = json.list;
+            for(let i = 0; this.state.hourlyWeather.length < 7 ; i++){
+              this.setWeatherData(weatherList[i]);
+            }
+            // console.log(this.state.hourlyWeather);
+          })
+          .then(()=>{
+            this.setState({
+              isLoaded: true
             })
           })
       })
       .catch(e => console.log(e));
   }
 
-  render() {
-    const { isLoaded, error, weatherInfo } = this.state;
+  setWeatherData(el){
+    const timezone = this.state.timezone;
+    const curTime = Moment(el.dt_txt).add(timezone, 'hours').format('YYYY-MM-DD HH:mm:ss');
     
+    const arrHour = ['00', '03', '06', '09', '12', '15', '18', '21'];
+    const hour = curTime.split(' ')[1].split(':')[0];
+
+    if(arrHour.indexOf(hour) !== -1){
+      const els = {
+        fullDT: curTime,
+        curTime: curTime.split(' ')[1],
+        hour: hour,
+        title: el.weather[0].main,
+        temperature: `${Math.floor(el.main.temp)}˚`,
+        humidity: `${el.main.humidity}%`,
+        city: this.state.weatherInfo.city
+      }
+      this.setState({
+        hourlyWeather: this.state.hourlyWeather.concat([els])
+      });
+    }
+  }
+
+  render() {
+    const { isLoaded, error, weatherInfo, hourlyWeather } = this.state;
     return (
-      <View style={styles.container}>
+      <LinearGradient colors={[`${this.state.bgColors[this.state.rndNo1]}`, `${this.state.bgColors[this.state.rndNo2]}`]} style={styles.container}>
         <StatusBar hidden={ true } />
-        {isLoaded ? <WeatherIndex weatherInfo={ weatherInfo }/> : (
+        {isLoaded ? <WeatherIndex weatherInfo={ weatherInfo } hourlyWeather={hourlyWeather}/> : (
           <View style={styles.loading}>
             { error ? null : <ActivityIndicator size="large"/>}
-            { error ? <Text style={styles.errorText}>{error}</Text> : <Text style={styles.textLoading}>Getting Data from Server...</Text> }
+            { error ? <Text style={styles.errorText}>{error}</Text> : 
+                <Text style={styles.textLoading}>Getting Data from Server...</Text> 
+            }
           </View>
         )}
         <AdMobBanner 
@@ -82,15 +122,13 @@ export default class App extends React.Component {
           adUnitID="ca-app-pub-7650830264106685/3543064850"
           onDidFailToReceiveAdWithError={ (e) => this.bannerError(e)}
         />
-      </View>
+      </LinearGradient>
     );
   }
 }
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
   },
   errorText: {
     color: "red",
@@ -98,7 +136,6 @@ const styles = StyleSheet.create({
   },
   loading: {
     flex: 1,
-    backgroundColor: '#FDF6AA',
     justifyContent: 'center',
     alignItems: 'center',
     

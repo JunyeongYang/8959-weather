@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo';
 import Weather from './Weather';
-import SubInfo from './SubInfo';
 import PropTypes from 'prop-types';
 
 // export default class Weather extends Component {
@@ -61,22 +60,25 @@ const weatherCases = {
   },
 }
 
-function WeatherIndex({ weatherInfo }){
+function WeatherIndex({ weatherInfo, hourlyWeather }){
   const wCases = weatherCases[`${weatherInfo.name}`];
-  // const wCases = weatherCases[`Rain`];
-  wCases.temperature = Math.floor(weatherInfo.temperature - 273.15);
+  if(!wCases) wCases = weathercases['Haze'];
+  wCases.temperature = weatherInfo.temperature;
+  wCases.curTime = weatherInfo.time;
+  wCases.fullDT = weatherInfo.fullDT;
+  wCases.humidity = weatherInfo.humidity;
+  wCases.city = weatherInfo.city;
   return(
-    // <View style={styles.container}>
-      // <LinearGradient colors={['#b721ff','#21d4fd']}>
-      <LinearGradient colors={wCases.colors} style={styles.container}>
-        <Weather wCases={ wCases }/>
-      </LinearGradient>
-    // </View>
+    <LinearGradient colors={wCases.colors} style={styles.container}>
+      <Text style={styles.city}>{weatherInfo.city}</Text>
+      <Weather wCases={ wCases } hourlyWeather={hourlyWeather} weatherCases={weatherCases}/>
+    </LinearGradient>
   );
 }
 
 WeatherIndex.propTypes = {
-  weatherInfo: PropTypes.object.isRequired
+  weatherInfo: PropTypes.object.isRequired,
+  hourlyWeather: PropTypes.array.isRequired
 }
 
  
@@ -84,6 +86,13 @@ export default WeatherIndex;
 
 const styles = StyleSheet.create({
   container: {
-    flex:1
+    flex:1,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
+  city: {
+    paddingTop: 20,
+    color: 'white',
+    fontSize: 20
+  }
 });

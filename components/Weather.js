@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, Clipboard } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import PropTypes from 'prop-types';
+import Toast, {DURATION} from 'react-native-easy-toast'
 
 // export default class Temperature extends Component {
 //   render() {
@@ -14,69 +15,61 @@ import PropTypes from 'prop-types';
 //   }
 // }
 
-function Weather({ wCases }){
+function renderData(hourlyWeather, weatherCases){
+  const weather = [];
+  hourlyWeather.forEach((el, index)=>{
+    const WC = weatherCases[`${el.title}`];
+    WC.temperature = el.temperature;
+    WC.humidity = el.humidity;
+    WC.fullDT = el.fullDT;
+    weather.push(
+      <TouchableOpacity onPress={()=> copy2Clipboard(el)} style={styles.content} key={index}>
+        <Text style={styles.time}>{el.hour}:00</Text>
+        <View style={styles.contView}>
+          <MaterialCommunityIcons style={styles.icons} color="white" size={40} name={WC.iconName} />
+        </View>
+        <View style={styles.contView}>
+          <Text style={styles.temp}>{WC.temperature}</Text>
+          <Text style={styles.title}>{WC.title}</Text>
+        </View>
+      </TouchableOpacity>
+    );
+  });
+  return weather;
+}
+
+async function copy2Clipboard(data){
+  const text = `[Time] ${data.fullDT} \n[Location] ${data.city}\n[Weather] ${data.title}\n[Temperature]: ${data.temperature}\n[Humidity]: ${data.humidity}`;
+  await Clipboard.setString(text);
+  toast.show('Copied to Clipboard!');
+}
+
+let toast = null;
+function Weather({ wCases, hourlyWeather , weatherCases}){
   return (
     <View style={styles.upper}>
-      <View style={styles.content}>
+      <TouchableOpacity onPress={()=> copy2Clipboard(wCases)} style={styles.curContent}>
+        <Text style={styles.curTime}>{wCases.curTime}</Text>
         <View style={styles.contView}>
           <MaterialCommunityIcons style={styles.icons} color="white" size={60} name={wCases.iconName} />
         </View>
         <View style={styles.contView}>
-          <Text style={styles.temp}>{wCases.temperature}˚</Text>
-          <Text style={styles.title}>{wCases.title}</Text>
+          <Text style={styles.curTemp}>{wCases.temperature}</Text>
+          <Text style={styles.curTitle}>{wCases.title}</Text>
         </View>
-      </View>
-      <View style={styles.content}>
-        <View style={styles.contView}>
-          <MaterialCommunityIcons style={styles.icons} color="white" size={60} name={wCases.iconName} />
-        </View>
-        <View style={styles.contView}>
-          <Text style={styles.temp}>{wCases.temperature}˚</Text>
-          <Text style={styles.title}>{wCases.title}</Text>
-        </View>
-      </View>
-      <View style={styles.content}>
-        <View style={styles.contView}>
-          <MaterialCommunityIcons style={styles.icons} color="white" size={60} name={wCases.iconName} />
-        </View>
-        <View style={styles.contView}>
-          <Text style={styles.temp}>{wCases.temperature}˚</Text>
-          <Text style={styles.title}>{wCases.title}</Text>
-        </View>
-      </View>
-      <View style={styles.content}>
-        <View style={styles.contView}>
-          <MaterialCommunityIcons style={styles.icons} color="white" size={60} name={wCases.iconName} />
-        </View>
-        <View style={styles.contView}>
-          <Text style={styles.temp}>{wCases.temperature}˚</Text>
-          <Text style={styles.title}>{wCases.title}</Text>
-        </View>
-      </View>
-      <View style={styles.content}>
-        <View style={styles.contView}>
-          <MaterialCommunityIcons style={styles.icons} color="white" size={60} name={wCases.iconName} />
-        </View>
-        <View style={styles.contView}>
-          <Text style={styles.temp}>{wCases.temperature}˚</Text>
-          <Text style={styles.title}>{wCases.title}</Text>
-        </View>
-      </View>
-      <View style={styles.content}>
-        <View style={styles.contView}>
-          <MaterialCommunityIcons style={styles.icons} color="white" size={60} name={wCases.iconName} />
-        </View>
-        <View style={styles.contView}>
-          <Text style={styles.temp}>{wCases.temperature}˚</Text>
-          <Text style={styles.title}>{wCases.title}</Text>
-        </View>
-      </View>
+      </TouchableOpacity>
+
+      {renderData(hourlyWeather, weatherCases)}
+
+      <Toast ref={(Toast)=> {toast = Toast}}/>
     </View>
   );
 }
 
 Weather.propTypes = {
-  wCases: PropTypes.object.isRequired
+  wCases: PropTypes.object.isRequired,
+  hourlyWeather: PropTypes.array.isRequired,
+  weatherCases: PropTypes.object.isRequired
 }
 
  
@@ -88,25 +81,49 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center'
   },
+  curContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 40,
+  },
+  curTime:{
+    paddingLeft: 30,
+    fontSize: 20,
+    color: 'white',
+  },
+  curTemp: {
+    fontSize: 30,
+    backgroundColor: 'transparent',
+    color: 'white',
+  },
+  curTitle: {
+    fontSize: 20,
+    color: 'white'
+  },
   content:{
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    marginBottom: 10,
+  },
+  time:{
+    paddingLeft: 30,
+    fontSize: 20,
+    color: 'white',
   },
   contView: {
     flex:1,
     alignItems: 'center',
     justifyContent: 'center'
   },
-  icons: {
-  },
   temp: {
-    fontSize: 40,
+    fontSize: 15,
     backgroundColor: 'transparent',
     color: 'white',
   },
   title: {
-    fontSize: 20,
+    fontSize: 10,
     color: 'white'
   }
 });
