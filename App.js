@@ -4,7 +4,6 @@ import WeatherIndex from "./components/WeatherIndex";
 import { AdMobBanner } from 'expo';
 import Moment from 'moment';
 import { LinearGradient } from 'expo';
-import Toast from 'react-native-easy-toast'
 
 const WEATHER_API_KEY = "151f154f63bc0d2064c7f558721da759";
 

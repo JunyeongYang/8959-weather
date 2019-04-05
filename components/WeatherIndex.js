@@ -61,7 +61,8 @@ const weatherCases = {
 }
 
 function WeatherIndex({ weatherInfo, hourlyWeather }){
-  const wCases = weatherCases[`${weatherInfo.name}`];
+  let wCases = weatherCases[`${weatherInfo.name}`];
+  // let wCases = weatherCases[`Rain`];
   if(!wCases) wCases = weathercases['Haze'];
   wCases.temperature = weatherInfo.temperature;
   wCases.curTime = weatherInfo.time;
