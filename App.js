@@ -4,16 +4,20 @@ import WeatherIndex from "./components/WeatherIndex";
 import { AdMobBanner } from 'expo';
 import Moment from 'moment';
 import { LinearGradient } from 'expo';
+import Toast from 'react-native-easy-toast'
 
 const WEATHER_API_KEY = "151f154f63bc0d2064c7f558721da759";
 
 export default class App extends React.Component {
   bannerError(e) {
-    alert(e);
+    this.setState({
+      adMobError:true
+    })
   }
 
   state = {
     isLoaded: false,
+    adMobError: false,
     error: null,
     timezone: Math.abs(new Date().getTimezoneOffset() / 60),
     weatherInfo: {
@@ -35,7 +39,6 @@ export default class App extends React.Component {
     navigator.geolocation.getCurrentPosition( 
       position => {
         this._getWeather(position.coords.latitude, position.coords.longitude);
-        console.log(position);
       },
       error => {
         this.setState({
@@ -117,11 +120,11 @@ export default class App extends React.Component {
             }
           </View>
         )}
-        <AdMobBanner 
-          bannerSize="smartBannerLandscape"
-          adUnitID="ca-app-pub-7650830264106685/3543064850"
-          onDidFailToReceiveAdWithError={ (e) => this.bannerError(e)}
-        />
+        {this.state.adMobError ? null : <AdMobBanner 
+                              bannerSize="smartBannerLandscape"
+                              adUnitID="ca-app-pub-7650830264106685/3543064850"
+                              onDidFailToReceiveAdWithError={ (e) => this.bannerError(e)}
+                            />}
       </LinearGradient>
     );
   }

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, Clipboard } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import PropTypes from 'prop-types';
-import Toast, {DURATION} from 'react-native-easy-toast'
+import Toast from 'react-native-easy-toast'
 
 // export default class Temperature extends Component {
 //   render() {
